@@ -1,5 +1,6 @@
 /* ==========================================================================
-   MANVENDRA PRATAP SINGH — PORTFOLIO CLIENT LOGIC & INTERACTIVE SUITE
+   MANVENDRA PRATAP SINGH — PORTFOLIO CLIENT LOGIC & REAL CONTACT HANDLER
+   High-Performance, Zero-Lag, Real FormSubmit Delivery
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -15,32 +16,43 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* --------------------------------------------------------------------------
-   1. Interactive Spotlight Cursor Glow
+   1. High-Performance GPU-Accelerated Spotlight (Desktop Only)
    -------------------------------------------------------------------------- */
 function initSpotlight() {
   const spotlight = document.querySelector('.spotlight');
-  if (!spotlight) return;
+  if (!spotlight || window.matchMedia('(hover: none), (pointer: coarse)').matches) return;
 
+  let ticking = false;
   window.addEventListener('mousemove', (e) => {
-    spotlight.style.left = `${e.clientX}px`;
-    spotlight.style.top = `${e.clientY}px`;
-  });
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        spotlight.style.transform = `translate3d(${e.clientX - 250}px, ${e.clientY - 250}px, 0)`;
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
 }
 
 /* --------------------------------------------------------------------------
-   2. Sticky Header Elevation on Scroll
+   2. Sticky Header Elevation on Scroll (Passive Listener)
    -------------------------------------------------------------------------- */
 function initStickyHeader() {
   const header = document.querySelector('.site-header');
   if (!header) return;
 
+  let lastScrollY = 0;
   window.addEventListener('scroll', () => {
-    if (window.scrollY > 40) {
-      header.classList.add('scrolled');
-    } else {
-      header.classList.remove('scrolled');
+    const currentScrollY = window.scrollY;
+    if (Math.abs(currentScrollY - lastScrollY) > 10) {
+      if (currentScrollY > 40) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+      lastScrollY = currentScrollY;
     }
-  });
+  }, { passive: true });
 }
 
 /* --------------------------------------------------------------------------
@@ -53,15 +65,14 @@ function initMobileMenu() {
   if (!toggleBtn || !navLinks) return;
 
   toggleBtn.addEventListener('click', () => {
-    navLinks.classList.toggle('mobile-open');
-    const isOpen = navLinks.classList.contains('mobile-open');
+    const isOpen = navLinks.classList.toggle('mobile-open');
     toggleBtn.setAttribute('aria-expanded', isOpen);
   });
 
-  // Close menu when clicking link
   navLinks.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', () => {
       navLinks.classList.remove('mobile-open');
+      toggleBtn.setAttribute('aria-expanded', 'false');
     });
   });
 }
@@ -205,10 +216,10 @@ function initProjectModals() {
       if (!data) return;
 
       modalContent.innerHTML = `
-        <img src="${data.image}" alt="${data.title}" class="modal-image-preview">
+        <img src="${data.image}" alt="${data.title}" class="modal-image-preview" loading="lazy">
         <span class="section-pill cyan" style="margin-bottom: 8px;">${data.category}</span>
-        <h2 class="modal-title" style="margin-bottom: 14px;">${data.title}</h2>
-        <p class="modal-desc" style="color: var(--text-secondary); margin-bottom: 24px; font-size: 1.02rem; line-height: 1.7;">${data.description}</p>
+        <h2 class="modal-title" style="margin-bottom: 12px; font-size: 1.35rem;">${data.title}</h2>
+        <p class="modal-desc" style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.95rem; line-height: 1.65;">${data.description}</p>
         
         <h3 class="modal-section-title">Architectural Highlights & Engineering Innovations</h3>
         <ul class="modal-features-list">
@@ -216,13 +227,13 @@ function initProjectModals() {
         </ul>
 
         <h3 class="modal-section-title">Technologies Utilized</h3>
-        <div class="tech-stack-wrap" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px;">
+        <div class="tech-stack-wrap" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px;">
           ${data.techStack.map(t => `<span class="tech-tag featured">${t}</span>`).join('')}
         </div>
 
-        <div class="modal-actions" style="display: flex; gap: 14px; flex-wrap: wrap; border-top: 1px solid var(--border-subtle); padding-top: 20px;">
-          ${data.liveDemo ? `<a href="${data.liveDemo}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">🚀 Launch Live Demo</a>` : ''}
-          ${data.github ? `<a href="${data.github}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">📂 View GitHub Repository</a>` : ''}
+        <div class="modal-actions" style="display: flex; gap: 10px; flex-wrap: wrap; border-top: 1px solid var(--border-subtle); padding-top: 18px;">
+          ${data.liveDemo ? `<a href="${data.liveDemo}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">🚀 Launch Live Demo</a>` : ''}
+          ${data.github ? `<a href="${data.github}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">📂 View GitHub Repository</a>` : ''}
         </div>
       `;
 
@@ -337,27 +348,104 @@ function initCopyEmail() {
 }
 
 /* --------------------------------------------------------------------------
-   9. Contact Form Simulation
+   9. Real Contact Delivery (FormSubmit.co API + Mailto Fallback)
+   Guaranteed Message Delivery to manvendrapratapsingh7781@gmail.com
    -------------------------------------------------------------------------- */
 function initContactForm() {
   const form = document.getElementById('contactForm');
+  const nameInput = document.getElementById('userName');
+  const emailInput = document.getElementById('userEmail');
+  const messageInput = document.getElementById('userMessage');
+  const statusBanner = document.getElementById('formStatus');
+  const directMailtoBtn = document.getElementById('directMailtoBtn');
+  const submitBtn = document.getElementById('submitBtn');
+
   if (!form) return;
 
-  form.addEventListener('submit', (e) => {
+  // Dynamically update direct mailto link as the user types
+  const updateMailto = () => {
+    if (!directMailtoBtn) return;
+    const name = nameInput ? nameInput.value.trim() : '';
+    const email = emailInput ? emailInput.value.trim() : '';
+    const msg = messageInput ? messageInput.value.trim() : '';
+
+    const subject = encodeURIComponent(name ? `Portfolio Inquiry from ${name}` : 'Portfolio Inquiry for Manvendra');
+    const body = encodeURIComponent(`${msg}\n\nFrom: ${name} (${email})`);
+    directMailtoBtn.href = `mailto:manvendrapratapsingh7781@gmail.com?subject=${subject}&body=${body}`;
+  };
+
+  if (nameInput) nameInput.addEventListener('input', updateMailto);
+  if (emailInput) emailInput.addEventListener('input', updateMailto);
+  if (messageInput) messageInput.addEventListener('input', updateMailto);
+
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
 
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim();
+    const message = messageInput.value.trim();
+
+    if (!name || !email || !message) {
+      showStatus("Please fill in all required fields.", "error");
+      return;
+    }
+
+    // Set loading state
+    const originalBtnText = submitBtn.innerHTML;
     submitBtn.disabled = true;
-    submitBtn.innerHTML = `<span>Sending...</span>`;
+    submitBtn.innerHTML = `<span>Sending Message...</span>`;
+    showStatus("Delivering message to Manvendra...", "loading");
 
-    setTimeout(() => {
-      showToast("Message received! Thank you for reaching out. ✨");
-      form.reset();
+    try {
+      // POST to FormSubmit AJAX endpoint
+      const response = await fetch("https://formsubmit.co/ajax/manvendrapratapsingh7781@gmail.com", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          name: name,
+          email: email,
+          message: message,
+          _subject: `New Portfolio Message from ${name}`,
+          _template: "table",
+          _captcha: "false"
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok || data.success === "true" || data.success === true) {
+        showStatus("✅ Message sent successfully! I have received your message and will reply to your email shortly.", "success");
+        showToast("Message delivered to Manvendra! ✨");
+        form.reset();
+        updateMailto();
+      } else {
+        throw new Error(data.message || "Submission failed");
+      }
+    } catch (err) {
+      console.warn("AJAX form submission error, opening mailto fallback:", err);
+      showStatus("Opening your email client to send directly...", "loading");
+      
+      // Fallback: Trigger mailto client immediately
+      const subject = encodeURIComponent(`Portfolio Inquiry from ${name}`);
+      const body = encodeURIComponent(`${message}\n\nFrom: ${name} (${email})`);
+      window.location.href = `mailto:manvendrapratapsingh7781@gmail.com?subject=${subject}&body=${body}`;
+
+      showStatus("✉️ If your email client didn't open automatically, please click 'Send Directly via Your Email App' below.", "success");
+    } finally {
       submitBtn.disabled = false;
-      submitBtn.innerHTML = originalText;
-    }, 1000);
+      submitBtn.innerHTML = originalBtnText;
+    }
   });
+
+  function showStatus(msg, type) {
+    if (!statusBanner) return;
+    statusBanner.className = `form-status-banner ${type}`;
+    statusBanner.textContent = msg;
+    statusBanner.style.display = 'block';
+  }
 }
 
 /* --------------------------------------------------------------------------

@@ -139,7 +139,7 @@
             </div>
 
             <div class="profile-avatar-wrap">
-              <img src="assets/images/manvendra_profile.png" alt="Manvendra Pratap Singh" class="profile-avatar-img">
+              <img src="assets/images/manvendra_profile.png" alt="Manvendra Pratap Singh" class="profile-avatar-img" width="305" height="401" fetchpriority="high" decoding="async">
             </div>
 
             <!-- Mini Live Console Widget -->
@@ -286,7 +286,7 @@
           <article class="project-card" data-category="security ai">
             <div class="project-media-col">
               <div class="project-screenshot-wrap" data-open-project="examshield" title="Click to view full architecture">
-                <img src="assets/images/examshield_preview.jpg" alt="ExamShield AI Dashboard Preview" class="project-screenshot-img" loading="lazy">
+                <img src="assets/images/examshield_preview.jpg" alt="ExamShield AI Dashboard Preview" class="project-screenshot-img" width="900" height="506" loading="lazy" decoding="async">
                 <span class="project-live-indicator">
                   <span class="status-dot"></span> Live Production
                 </span>
@@ -349,7 +349,7 @@
           <article class="project-card reverse" data-category="ai">
             <div class="project-media-col">
               <div class="project-screenshot-wrap" data-open-project="agentflow" title="Click to view full architecture">
-                <img src="assets/images/agentflow_preview.jpg" alt="AgentFlow Studio Dashboard Preview" class="project-screenshot-img" loading="lazy">
+                <img src="assets/images/agentflow_preview.jpg" alt="AgentFlow Studio Dashboard Preview" class="project-screenshot-img" width="900" height="506" loading="lazy" decoding="async">
                 <span class="project-live-indicator">
                   <span class="status-dot"></span> Active Codebase
                 </span>
@@ -409,7 +409,7 @@
           <article class="project-card" data-category="analytics">
             <div class="project-media-col">
               <div class="project-screenshot-wrap" data-open-project="attrivance" title="Click to view full architecture">
-                <img src="assets/images/attrivance_preview.jpg" alt="Attrivance Customer Retention Intelligence Preview" class="project-screenshot-img" loading="lazy">
+                <img src="assets/images/attrivance_preview.jpg" alt="Attrivance Customer Retention Intelligence Preview" class="project-screenshot-img" width="900" height="506" loading="lazy" decoding="async">
                 <span class="project-live-indicator">
                   <span class="status-dot"></span> ML Decision Support
                 </span>
@@ -469,7 +469,7 @@
           <article class="project-card reverse" data-category="ai">
             <div class="project-media-col">
               <div class="project-screenshot-wrap" data-open-project="zenithlead" title="Click to view full architecture">
-                <img src="assets/images/zenithlead_preview.jpg" alt="ZenithLead AI Lead Intelligence Preview" class="project-screenshot-img" loading="lazy">
+                <img src="assets/images/zenithlead_preview.jpg" alt="ZenithLead AI Lead Intelligence Preview" class="project-screenshot-img" width="900" height="506" loading="lazy" decoding="async">
                 <span class="project-live-indicator">
                   <span class="status-dot"></span> B2B Automation
                 </span>
@@ -729,28 +729,44 @@
             </div>
           </div>
 
-          <!-- Contact Form -->
+          <!-- Contact Form with Real Delivery -->
           <div class="contact-form-col">
-            <form id="contactForm">
+            <form id="contactForm" action="https://formsubmit.co/manvendrapratapsingh7781@gmail.com" method="POST">
+              <!-- FormSubmit Configuration -->
+              <input type="hidden" name="_captcha" value="false">
+              <input type="hidden" name="_template" value="table">
+              <input type="hidden" name="_subject" value="New Portfolio Message for Manvendra">
+
               <div class="form-group">
                 <label for="userName" class="form-label">Your Name</label>
-                <input type="text" id="userName" class="form-input" placeholder="e.g. Alex Morgan" required>
+                <input type="text" id="userName" name="name" class="form-input" placeholder="e.g. Alex Morgan" required autocomplete="name">
               </div>
 
               <div class="form-group">
                 <label for="userEmail" class="form-label">Your Email</label>
-                <input type="email" id="userEmail" class="form-input" placeholder="e.g. alex@company.com" required>
+                <input type="email" id="userEmail" name="email" class="form-input" placeholder="e.g. alex@company.com" required autocomplete="email">
               </div>
 
               <div class="form-group">
                 <label for="userMessage" class="form-label">Message / Project Inquiry</label>
-                <textarea id="userMessage" class="form-textarea" placeholder="Tell me about your team, project, or role..." required></textarea>
+                <textarea id="userMessage" name="message" class="form-textarea" placeholder="Tell me about your team, project, or role..." required></textarea>
               </div>
 
-              <button type="submit" class="btn btn-primary" style="width: 100%;">
+              <button type="submit" id="submitBtn" class="btn btn-primary" style="width: 100%;">
                 <span>Send Message</span>
                 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
               </button>
+
+              <div id="formStatus" class="form-status-banner" style="display: none;"></div>
+
+              <div class="contact-or-divider">
+                <span>OR</span>
+              </div>
+
+              <a id="directMailtoBtn" href="mailto:manvendrapratapsingh7781@gmail.com?subject=Portfolio%20Inquiry" class="btn btn-secondary" style="width: 100%; font-size: 0.86rem;">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                <span>Send Directly via Your Email App</span>
+              </a>
             </form>
           </div>
         </div>
