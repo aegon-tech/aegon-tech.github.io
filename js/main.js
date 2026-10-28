@@ -4,10 +4,17 @@
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Ensure permanent Day Mode (Light Theme)
+  document.documentElement.removeAttribute('data-theme');
+  try {
+    localStorage.removeItem('theme');
+  } catch (e) {
+    // Ignore storage restrictions
+  }
+
   initSpotlight();
   initStickyHeader();
   initMobileMenu();
-  initThemeToggle();
   initProjectFilters();
   initProjectModals();
   initInteractiveTerminal();
@@ -61,55 +68,60 @@ function initStickyHeader() {
 function initMobileMenu() {
   const toggleBtn = document.querySelector('.mobile-menu-btn');
   const navLinks = document.querySelector('.nav-links');
+  const backdrop = document.getElementById('mobileMenuBackdrop');
 
   if (!toggleBtn || !navLinks) return;
 
+  const closeMenu = () => {
+    navLinks.classList.remove('mobile-open');
+    toggleBtn.setAttribute('aria-expanded', 'false');
+    toggleBtn.classList.remove('is-active');
+    if (backdrop) backdrop.classList.remove('active');
+    document.body.classList.remove('nav-locked');
+  };
+
+  const openMenu = () => {
+    navLinks.classList.add('mobile-open');
+    toggleBtn.setAttribute('aria-expanded', 'true');
+    toggleBtn.classList.add('is-active');
+    if (backdrop) backdrop.classList.add('active');
+    document.body.classList.add('nav-locked');
+  };
+
   toggleBtn.addEventListener('click', () => {
-    const isOpen = navLinks.classList.toggle('mobile-open');
-    toggleBtn.setAttribute('aria-expanded', isOpen);
+    const isOpen = navLinks.classList.contains('mobile-open');
+    if (isOpen) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
   });
 
-  navLinks.querySelectorAll('.nav-link').forEach(link => {
+  if (backdrop) {
+    backdrop.addEventListener('click', closeMenu);
+  }
+
+  navLinks.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', () => {
-      navLinks.classList.remove('mobile-open');
-      toggleBtn.setAttribute('aria-expanded', 'false');
+      closeMenu();
     });
   });
-}
 
-/* --------------------------------------------------------------------------
-   4. Theme Toggle (Dark / Light)
-   -------------------------------------------------------------------------- */
-function initThemeToggle() {
-  const toggleBtn = document.querySelector('.theme-toggle-btn');
-  if (!toggleBtn) return;
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && navLinks.classList.contains('mobile-open')) {
+      closeMenu();
+    }
+  });
 
-  const currentTheme = localStorage.getItem('theme') || 'dark';
-  document.documentElement.setAttribute('data-theme', currentTheme);
-  updateThemeIcon(toggleBtn, currentTheme);
-
-  toggleBtn.addEventListener('click', () => {
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    const newTheme = isDark ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-    updateThemeIcon(toggleBtn, newTheme);
-    showToast(`Switched to ${newTheme} theme`);
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 992 && navLinks.classList.contains('mobile-open')) {
+      closeMenu();
+    }
   });
 }
 
-function updateThemeIcon(btn, theme) {
-  if (theme === 'light') {
-    btn.innerHTML = `<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>`;
-    btn.setAttribute('aria-label', 'Switch to Dark Mode');
-  } else {
-    btn.innerHTML = `<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>`;
-    btn.setAttribute('aria-label', 'Switch to Light Mode');
-  }
-}
-
 /* --------------------------------------------------------------------------
-   5. Project Filtering Logic
+   4. Project Filtering Logic
    -------------------------------------------------------------------------- */
 function initProjectFilters() {
   const filterBtns = document.querySelectorAll('.filter-btn');
@@ -217,9 +229,9 @@ function initProjectModals() {
 
       modalContent.innerHTML = `
         <img src="${data.image}" alt="${data.title}" class="modal-image-preview" loading="lazy">
-        <span class="section-pill cyan" style="margin-bottom: 8px;">${data.category}</span>
-        <h2 class="modal-title" style="margin-bottom: 12px; font-size: 1.35rem;">${data.title}</h2>
-        <p class="modal-desc" style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.95rem; line-height: 1.65;">${data.description}</p>
+        <span class="section-pill">${data.category}</span>
+        <h2 class="modal-title">${data.title}</h2>
+        <p class="modal-desc">${data.description}</p>
         
         <h3 class="modal-section-title">Architectural Highlights & Engineering Innovations</h3>
         <ul class="modal-features-list">
@@ -227,11 +239,11 @@ function initProjectModals() {
         </ul>
 
         <h3 class="modal-section-title">Technologies Utilized</h3>
-        <div class="tech-stack-wrap" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px;">
+        <div class="tech-stack-wrap">
           ${data.techStack.map(t => `<span class="tech-tag featured">${t}</span>`).join('')}
         </div>
 
-        <div class="modal-actions" style="display: flex; gap: 10px; flex-wrap: wrap; border-top: 1px solid var(--border-subtle); padding-top: 18px;">
+        <div class="modal-actions">
           ${data.liveDemo ? `<a href="${data.liveDemo}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">🚀 Launch Live Demo</a>` : ''}
           ${data.github ? `<a href="${data.github}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">📂 View GitHub Repository</a>` : ''}
         </div>
@@ -267,10 +279,11 @@ function initInteractiveTerminal() {
   if (!terminalBody || !termInput) return;
 
   const COMMANDS = {
-    help: "Available commands:\n  • whoami    : About Manvendra Pratap Singh\n  • skills    : Technical competencies & frameworks\n  • projects  : List key enterprise projects\n  • examshield: Inspect ExamShield AI forensic suite\n  • agentflow : Inspect AgentFlow Studio DAG engine\n  • contact   : Get email, GitHub & LinkedIn links\n  • resume    : Download verified Resume (PDF)\n  • clear     : Clear terminal history",
+    help: "Available commands:\n  • whoami    : About Manvendra Pratap Singh\n  • skills    : Technical competencies & frameworks\n  • projects  : List key enterprise projects\n  • services  : View what I can build for you\n  • examshield: Inspect ExamShield AI forensic suite\n  • agentflow : Inspect AgentFlow Studio DAG engine\n  • contact   : Get email, GitHub & LinkedIn links\n  • resume    : Download verified Resume (PDF)\n  • clear     : Clear terminal history",
     whoami: "Manvendra Pratap Singh\nRole: Python Developer & AI Systems Engineer\nLocation: Gorakhpur, UP, India\nSpecialization: In-memory document security, Google Gemini workflows, and predictive analytics.\nEducation: B.C.A Data Analytics @ Amity University Online",
     skills: "Languages: Python, TypeScript, SQL, R, Shell Scripting\nFrameworks: FastAPI, Streamlit, Next.js, PyMuPDF, Pandas, OpenCV\nAI & Agents: Google Gemini SDK, Topological DAGs, Prompt Isolation\nAnalytics: TreeSHAP, Churn Modeling, Forensic Steganography",
     projects: "1. ExamShield AI  [Forensic PDF Security Suite | Streamlit + Gemini + PyMuPDF]\n2. AgentFlow Studio [Visual Multi-Agent DAG Engine | Next.js + FastAPI]\n3. Attrivance       [Customer Retention Intelligence | ML + TreeSHAP]\n4. ZenithLead AI    [Intelligent B2B Lead Generation | TypeScript + Gemini]",
+    services: "What I Can Build For You:\n• Business Websites & Landing Pages (modern, fast, high-converting)\n• Portfolio Websites (distinctive, editorial, interactive showcases)\n• Business Automation Tools (Python scripts, batch processors, workflows)\n• Lead Generation Tools (prospect discovery, scraping & qualification)\n• Custom Web Applications (dashboards, trackers, and business tools)\n\nReady to start? Email: manvendrapratapsingh7781@gmail.com or type 'contact'",
     examshield: "ExamShield AI\n• Status: Production / Live\n• Demo: https://examshield-ai.streamlit.app\n• GitHub: https://github.com/aegon-tech/ExamShield-AI\n• Innovation: Zero disk persistence PDF watermarking & AI variant questions",
     agentflow: "AgentFlow Studio\n• Status: Active Development\n• GitHub: https://github.com/aegon-tech/AgentFlow_Studio\n• Innovation: Parallel layered DAG execution with Google Gemini structured reasoning",
     attrivance: "Attrivance\n• Status: Active\n• GitHub: https://github.com/aegon-tech/Attrivance\n• Innovation: TreeSHAP feature attribution with dual policy threshold simulation",
